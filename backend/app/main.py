@@ -1,8 +1,11 @@
+import os
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from app.database import engine,Base,SessionLocal
 from app.models import Base,User,Role,Candidate,CandidateStatus
 from app.auth import get_password_hash
+from fastapi.middleware.cors import CORSMiddleware
+from app.routers import auth as auth_router
 
 def bootstrap_mock_data():
     """Seeds Only runs if the users table is empty and call on
@@ -56,6 +59,17 @@ async def lifespan(app:FastAPI):
    print("[SHUTDOWN] Application  resources Cleanup.")
 
 app=FastAPI(title="Candidate Dashboard")
+
+origins = os.getenv("CORS_ORIGINS", "http://localhost:5173").split(",")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+app.include_router(auth_router.router)
 
 @app.get("/health")
 def health():
