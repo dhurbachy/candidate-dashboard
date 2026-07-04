@@ -35,3 +35,19 @@ def register(payload: UserRegister, db: Session = Depends(get_db)):
     logger.info(f"Successfully provisioned baseline reviewer account: {new_user.email}")
     return {"message": "Account created successfully with reviewer baseline privileges."}
 
+@router.post("/login", response_model=Token)
+def login(payload: UserLogin, db: Session = Depends(get_db)):
+    
+    user = db.query(User).filter(User.email == payload.email).first()
+    
+    if not user or not verify_password(payload.password, user.hashed_password):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, 
+            detail="Invalid credential pairing. Verification failed."
+        )
+    
+    token_claims = {"sub": user.email, "role": user.role, "id": user.id}
+    access_token = create_access_token(data=token_claims)
+    
+    logger.info(f"Successful session login token created for account ID: {user.id}")
+    return {"access_token": access_token, "token_type": "bearer"}
