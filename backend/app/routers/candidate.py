@@ -81,3 +81,20 @@ async def submit_score(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
     return record
    
+
+@router.post("/{candidate_id}/summary",response_model=SummaryResponse)
+async def trigger_summary(
+    candidate_id: str,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+    request: Request=None,
+):
+    
+    client = request.app.state.gemini_container.get_client()
+    service = CandidateService(db,gemini_client=client)
+    try:
+        summary = await service.generate_summary(candidate_id)
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+    return SummaryResponse(status="ready", summary=summary)
+ 
