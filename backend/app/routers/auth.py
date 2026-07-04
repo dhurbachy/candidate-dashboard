@@ -25,7 +25,7 @@ def register(payload: UserRegister, db: Session = Depends(get_db)):
    
     new_user = User(
         email=payload.email,
-        hashed_password=get_password_hash(payload.password),
+        password=get_password_hash(payload.password),
         role=Role.reviewer
     )
     
@@ -40,7 +40,7 @@ def login(payload: UserLogin, db: Session = Depends(get_db)):
     
     user = db.query(User).filter(User.email == payload.email).first()
     
-    if not user or not verify_password(payload.password, user.hashed_password):
+    if not user or not verify_password(payload.password, user.password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, 
             detail="Invalid credential pairing. Verification failed."
