@@ -114,3 +114,34 @@ def archive_candidate(
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
     
+
+@router.get("/stream/scores", response_class=StreamingResponse)
+async def stream_live_score_cards(
+    current_user: dict = Depends(get_current_user)
+):
+    """
+    Real-time Server-Sent Events (SSE) telemetry data pipeline.
+    Streams active assessment updates dynamically over a long-lived HTTP connection.
+    """
+    async def sse_event_generator():
+        listener = score_broadcaster.subscribe()
+        
+        try:
+            while True:
+                try:
+                    event = await asyncio.wait_for(listener.__anext__(), timeout=15.0)
+                    yield event
+                except asyncio.TimeoutError:
+                    yield ": ping\n\n"
+        except (asyncio.CancelledError, StopAsyncIteration):
+            pass
+
+    return StreamingResponse(
+        sse_event_generator(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache, no-transform",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no" 
+        }
+    )
