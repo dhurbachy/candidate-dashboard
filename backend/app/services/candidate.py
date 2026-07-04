@@ -65,3 +65,11 @@ class CandidateService:
             candidate.internal_notes = None
         return candidate
     
+    def get_candidate(self,candidate_id:int)->Optional[Candidate]:
+        return (
+            self.db.query(Candidate)
+            .filter(Candidate.id==candidate_id,Candidate.deleted_at.is_(None))
+            .first()
+        )
+        
+    
