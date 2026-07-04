@@ -1,11 +1,14 @@
 import os
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, status
 from contextlib import asynccontextmanager
-from app.database import engine,Base,SessionLocal
+from fastapi.responses import JSONResponse
+
+from app.database import engine,SessionLocal
 from app.models import Base,User,Role,Candidate,CandidateStatus
 from app.auth import get_password_hash
 from fastapi.middleware.cors import CORSMiddleware
 from app.routers import candidate,auth as auth_router
+from app.logging import logger
 
 def bootstrap_mock_data():
     """Seeds Only runs if the users table is empty and call on
@@ -47,18 +50,22 @@ def bootstrap_mock_data():
         ])
 
         db.commit()
+        logger.info("Bootstrapped mock data")
+
     finally:
         db.close()
 
 @asynccontextmanager
 async def lifespan(app:FastAPI):
+   logger.info("Starting up the application")
    Base.metadata.create_all(bind=engine)
    bootstrap_mock_data()
-   print("[STARTUP] database initialized successfully.")
    yield
-   print("[SHUTDOWN] Application  resources Cleanup.")
+   logger.info("SIGTERM/SIGINT signal intercepted. Initiating graceful engine shutdown...")
+   engine.dispose()
+   logger.info("Database connection pools drained successfully. Application offline.")
 
-app=FastAPI(title="Candidate Dashboard")
+app=FastAPI(title="Candidate Dashboard",lifespan=lifespan)
 
 origins = os.getenv("CORS_ORIGINS", "http://localhost:5173").split(",")
 
@@ -71,6 +78,17 @@ app.add_middleware(
 )
 app.include_router(auth_router.router)
 app.include_router(candidate.router)
+
+@app.exception_handler(Exception)
+async def catchall_error_boundary(request: Request, exc: Exception):
+    logger.error(
+        f"Uncaught critical panic exception on route {request.url.path}: {str(exc)}",
+        exc_info=True,
+    )
+    return JSONResponse(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        content={"detail": "An internal operational error occurred"},
+    )
 
 @app.get("/health")
 def health():
