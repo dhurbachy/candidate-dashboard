@@ -17,7 +17,7 @@ class Settings(BaseSettings):
 
     DATABASE_URL:str=Field("sqlite:///./techkraft.db", env="DATABASE_URL")
     GEMINI_API_KEY: str = Field(default="MOCK_API_KEY", alias="GEMINI_API_KEY")
-    JWT_SECRET:str=Field(..., env="JWT_SECRET")
+    JWT_SECRET: str = Field(default="fallback_temporary_secret_key", validation_alias="JWT_SECRET")
     JWT_ALGORITHM:str="HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES:int=60
 
