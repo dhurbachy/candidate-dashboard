@@ -53,3 +53,31 @@ def get_candidate_details(
     # scores=4
     return CandidateDetailResponse(candidate=candidate, scores=scores)
   
+@router.post("/{candidate_id}/scores", response_model=ScoreOut, status_code=status.HTTP_201_CREATED)
+async def submit_score(
+     candidate_id: int,
+    payload: ScoreCreate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """
+    Attaches evaluation assessment scores cards.
+    Guarantees clean connection isolation boundaries with automated transactional rolling-back.
+    """
+    candidate = db.query(Candidate).filter(Candidate.id == candidate_id).first()
+    if not candidate:
+        raise HTTPException(status_code=404, detail="Target candidate profile reference missing.")
+    
+    service = CandidateService(db)
+    try:
+        record = await service.add_score(
+            candidate_id=candidate_id,
+            reviewer=current_user,
+            category=payload.category,
+            score=payload.score,
+            note=payload.note,
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+    return record
+   
