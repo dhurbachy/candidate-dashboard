@@ -1,10 +1,9 @@
 from sqlalchemy import create_engine
 import os
 from sqlalchemy.orm import sessionmaker,declarative_base
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./candidates.db")
-
+from app.config import settings
 engine=create_engine(
-    DATABASE_URL,
+    settings.DATABASE_URL,
     pool_pre_ping=True ,
     pool_size=10,
     max_overflow=20,
