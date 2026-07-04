@@ -36,3 +36,20 @@ def get_all_candidates(
 
     return CandidateListResponse(items=items,total=total,page=page,page_size=page_size)
 
+
+@router.get("/{candidate_id}",response_model=CandidateDetailResponse)
+def get_candidate_details(
+    candidate_id: int, 
+    current_user: dict = Depends(get_current_user), 
+    db: Session = Depends(get_db)
+):
+    service=CandidateService(db)
+    candidate=service.get_candidate(candidate_id)
+    if candidate is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Candidate not found")
+ 
+    candidate = service.redact_for_viewer(candidate, current_user)
+    scores = service.get_scores_for_viewer(candidate_id, current_user)
+    # scores=4
+    return CandidateDetailResponse(candidate=candidate, scores=scores)
+  
