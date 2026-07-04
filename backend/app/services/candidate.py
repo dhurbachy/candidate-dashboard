@@ -144,3 +144,13 @@ class CandidateService:
         )
     
     
+    def archieve_candidate(self,candidate_id:str)->Candidate:
+        candidate=self.get_candidate(candidate_id)
+        if candidate is None:
+            raise ValueError("Candidate Not Found")
+        
+        candidate.status=CandidateStatus.archived
+        candidate.deleted_at=datetime.utcnow()
+        self.db.commit()
+        self.db.refresh(candidate)
+        return candidate
