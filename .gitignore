@@ -1,0 +1,31 @@
+# Local environment variables
+.env
+.env.local
+.env.*.local
+
+# python artifacts
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+.pytest_cache/
+
+# react artifacts
+node_modules/
+dist/
+dist-ssr
+*.local
+
+# database files
+*.db
+*.sqlite3
+
+# os files
+.DS_Store
+Thumbs.db 
