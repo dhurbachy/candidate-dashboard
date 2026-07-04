@@ -98,3 +98,19 @@ async def trigger_summary(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
     return SummaryResponse(status="ready", summary=summary)
  
+@router.delete("/{id}",status_code=status.HTTP_204_NO_CONTENT)
+def archive_candidate(
+    candidate_id: str,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    # Admin-only. Always a soft delete - see CandidateService.archive_candidate.
+    if current_user.role != Role.admin:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Admin access required")
+ 
+    service = CandidateService(db)
+    try:
+        service.archieve_candidate(candidate_id)
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+    
