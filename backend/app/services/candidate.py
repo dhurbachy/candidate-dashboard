@@ -101,5 +101,46 @@ class CandidateService:
         
         return record
 
-        
+    async def generate_summary(self,candidate_id:str)->Dict[str, str]:
+        candidate=self.get_candidate(candidate_id)
+        if candidate is None:
+            raise ValueError("Candidate Not Found")
+        # await asyncio.sleep(2)
+        skills_str=", ".join(candidate.skills) if candidate.skills else "no listed skills"
+        prompt = (
+            f"Write a concise executive summary for this job applicant.\n"
+            f"Name: {candidate.name}\n"
+            f"Role Applied For: {candidate.role_applied}\n"
+            f"Skills: {skills_str}\n"
+            f"Status: {candidate.status}"
+        )
+        try:
+            # response = await self.gemini_client.aio.models.generate_content(
+            #     model="gemini-2.5-flash",
+            #     contents=prompt
+            # )
+            response = await asyncio.to_thread(
+                self.gemini_client.models.generate_content,
+                model="gemini-2.5-flash",
+                contents=prompt,
+            )
+            summary = response.text.strip()
+            summary_method = "llm"
+
+        except Exception as e:
+            logger.error(f"Gemini summary generation failed for candidate {candidate_id}: {e}", exc_info=True)
+            summary = self._fallback_summary(candidate, skills_str)
+            summary_method = "fallback"
+
+        candidate.ai_summary = summary
+        await asyncio.to_thread(self.db.commit)
+        return {"summary": summary, "generated_by": summary_method}
+
+    def _fallback_summary(self, candidate, skills_str: str) -> str:
+        """Deterministic local generation if Gemini is unreachable."""
+        return (
+            f"{candidate.name} applied for {candidate.role_applied} "
+            f"with skills: {skills_str}. Status: {candidate.status}."
+        )
+    
     
