@@ -50,3 +50,18 @@ class CandidateService:
 
         return items,total
     
+    def get_scores_for_viewer(self, candidate_id: int, viewer: User) -> List[Score]:
+        """Reviewers only see their own scores; admins see everyone's."""
+        query = self.db.query(Score).filter(Score.candidate_id == candidate_id)
+        if viewer.role != "admin":
+            query = query.filter(Score.reviewer_id == viewer.id)
+        return query.order_by(Score.created_at.desc()).all()
+ 
+    def redact_for_viewer(self, candidate: Candidate, viewer: User) -> Candidate:
+        """internal_notes is admin-only. Strip it server-side rather than
+        trusting the frontend to hide it - the frontend is not a security
+        boundary."""
+        if viewer.role != "admin":
+            candidate.internal_notes = None
+        return candidate
+    
