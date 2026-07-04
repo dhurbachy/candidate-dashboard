@@ -50,6 +50,7 @@ def bootstrap_mock_data():
 @asynccontextmanager
 async def lifespan(app:FastAPI):
    Base.metadata.create_all(bind=engine)
+   bootstrap_mock_data()
    print("[STARTUP] database initialized successfully.")
    yield
    print("[SHUTDOWN] Application  resources Cleanup.")
