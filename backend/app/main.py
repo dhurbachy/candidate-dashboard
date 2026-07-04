@@ -1,14 +1,17 @@
 import os
-from fastapi import FastAPI, Request, status
 from contextlib import asynccontextmanager
-from fastapi.responses import JSONResponse
 
-from app.database import engine,SessionLocal
-from app.models import Base,User,Role,Candidate,CandidateStatus
-from app.auth import get_password_hash
+from fastapi import FastAPI, Request, status
+from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers import candidate,auth as auth_router
+from google.genai.types import HttpOptions, HttpRetryOptions
+from app.database import engine, SessionLocal
+from app.models import Base, User, Candidate, Role, CandidateStatus
+from app.auth import get_password_hash
+from app.routers import candidate, auth as auth_router
 from app.logging import logger
+from google import genai
+from app.config import settings
 
 def bootstrap_mock_data():
     """Seeds Only runs if the users table is empty and call on
@@ -55,6 +58,28 @@ def bootstrap_mock_data():
     finally:
         db.close()
 
+class GeminiClientContainer:
+
+    def __init__(self):
+        self._client = None
+
+    def get_client(self) -> genai.Client:
+        if self._client is None:
+            retry_config = HttpRetryOptions(
+                attempts=3,          # Cap attempts at 3 to protect your token budget
+                initial_delay=1.0,      # Start with a 1-second pause
+                max_delay=10.0,         # Never freeze the thread longer than 10 seconds
+            )
+            options = HttpOptions(retry_options=retry_config)
+            self._client = genai.Client(api_key=settings.GEMINI_API_KEY)
+        return self._client
+
+    async def close(self):
+        if self._client and hasattr(self._client, "aclose"):
+            try:
+                await self._client.aclose()
+            except Exception:
+                pass 
 @asynccontextmanager
 async def lifespan(app:FastAPI):
    logger.info("Starting up the application")
