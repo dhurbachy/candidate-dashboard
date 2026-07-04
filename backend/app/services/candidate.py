@@ -71,5 +71,35 @@ class CandidateService:
             .filter(Candidate.id==candidate_id,Candidate.deleted_at.is_(None))
             .first()
         )
+
+    async def add_score(self,candidate_id:int,reviewer:User,category:str,score:int,note:Optional[str])->Score:
+        candidate=self.get_candidate(candidate_id)
+        if candidate is None:
+            raise ValueError("Candidate not found")
+        record =Score(
+           candidate_id=candidate_id,
+           category=category,
+           rating=score,
+           reviewer_id=reviewer.id,
+           note=note,
+        )
+
+        self.db.add(record)
+        if candidate.status==CandidateStatus.new:
+           candidate.status=CandidateStatus.reviewed
+        self.db.commit()
+        self.db.refresh(record)
+
+        
+        await score_broadcaster.broadcast_score_update(
+            candidate_id=candidate_id,
+            category=category,
+            score=score,
+            reviewer_name=reviewer.email
+        )
+    
+        
+        return record
+
         
     
