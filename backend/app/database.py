@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine
 import os
-
+from sqlalchemy.orm import sessionmaker
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./candidates.db")
 
 engine=create_engine(
@@ -11,3 +11,4 @@ engine=create_engine(
     echo=False
 )
 
+SessionLocal=sessionmaker(autocommit=False,autoflush=False,bind=create_engine)
