@@ -4,12 +4,15 @@ import tailwindcss from '@tailwindcss/vite'
 import path from 'path'
 
 // https://vite.dev/config/
+
+
 export default defineConfig(({ mode }) => {
-  // Load env file based on `mode` in the current working directory.
-  // The third parameter '' loads all env variables regardless of the VITE_ prefix.
-  const env = loadEnv(mode, process.cwd(), '')
+    const envDirectory = path.resolve(__dirname, '../')
+     const env = loadEnv(mode, envDirectory, '')
 
   return {
+        envDir: envDirectory,
+
     plugins: [react(), tailwindcss()],
     resolve: {
       alias: {
@@ -21,7 +24,7 @@ export default defineConfig(({ mode }) => {
     port: 5173,
       proxy: {
         '/api': {
-          target: 'http://localhost:8000', 
+          target: env.VITE_API_BASE_URL || 'http://localhost:8000', 
           changeOrigin: true,
         },
       },
