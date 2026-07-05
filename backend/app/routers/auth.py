@@ -9,7 +9,7 @@ from app.auth import get_password_hash, verify_password, create_access_token,get
 from app.logging import logger
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
-router = APIRouter(prefix="/api/auth", tags=["Authentication Gateway Suite"])
+router = APIRouter(prefix="/auth", tags=["Authentication Gateway Suite"])
 bearer_scheme = HTTPBearer()
 
 @router.post("/register", status_code=status.HTTP_201_CREATED)

@@ -85,7 +85,11 @@ async def lifespan(app:FastAPI):
    logger.info("Starting up the application")
    Base.metadata.create_all(bind=engine)
    bootstrap_mock_data()
+   container = GeminiClientContainer()
+   app.state.gemini_container = container
    yield
+   await container.close()
+
    logger.info("SIGTERM/SIGINT signal intercepted. Initiating graceful engine shutdown...")
    engine.dispose()
    logger.info("Database connection pools drained successfully. Application offline.")
@@ -101,8 +105,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-app.include_router(auth_router.router)
-app.include_router(candidate.router)
+app.include_router(auth_router.router,prefix="/api")
+app.include_router(candidate.router,prefix="/api")
 
 @app.exception_handler(Exception)
 async def catchall_error_boundary(request: Request, exc: Exception):

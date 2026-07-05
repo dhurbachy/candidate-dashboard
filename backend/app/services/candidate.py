@@ -10,7 +10,7 @@ from logging import Logger
 from google.genai import errors
 
 class CandidateService:
-    def __init__(self,db:Session,gemini_client: genai.Client):
+    def __init__(self,db:Session,gemini_client: Optional[genai.Client]=None):
         self.db=db
         self.gemini_client = gemini_client
 
@@ -128,7 +128,7 @@ class CandidateService:
             summary_method = "llm"
 
         except Exception as e:
-            logger.error(f"Gemini summary generation failed for candidate {candidate_id}: {e}", exc_info=True)
+            # Logger.error(f"Gemini summary generation failed for candidate {candidate_id}: {e}", exc_info=True)
             summary = self._fallback_summary(candidate, skills_str)
             summary_method = "fallback"
 
