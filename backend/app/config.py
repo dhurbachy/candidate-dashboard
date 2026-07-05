@@ -1,7 +1,11 @@
 import os
 from pydantic_settings import BaseSettings,SettingsConfigDict
 from pydantic import Field
+from pathlib import Path
 
+
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
+ENV_FILE = BASE_DIR / ".env"
 class Settings(BaseSettings):
     """ 
     Centralized Configuration Enginee created a object during startup
@@ -23,7 +27,7 @@ class Settings(BaseSettings):
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
     COOKIE_SECURE: bool = True
 
-    model_config=SettingsConfigDict(env_file=".env",extra="ignore")
+    model_config=SettingsConfigDict(env_file=ENV_FILE,extra="ignore")
 
 
 settings=Settings()

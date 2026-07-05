@@ -29,9 +29,11 @@ def get_all_candidates(
     page:int=Query(1,ge=1),
     page_size: int = Query(20, ge=1, le=50),
     current_user: dict = Depends(get_current_user), 
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    request: Request=None
 ):
-    service=CandidateService(db)
+    client = request.app.state.gemini_container.get_client()
+    service=CandidateService(db,gemini_client=client)
     items,total=service.list_candidates(status=status_filter,role_applied=role_applied,skill=skill,keyword=keyword,page=page,page_size=page_size)
 
     return CandidateListResponse(items=items,total=total,page=page,page_size=page_size)
@@ -41,9 +43,12 @@ def get_all_candidates(
 def get_candidate_details(
     candidate_id: int, 
     current_user: dict = Depends(get_current_user), 
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    request: Request=None
+
 ):
-    service=CandidateService(db)
+    client = request.app.state.gemini_container.get_client()
+    service=CandidateService(db,gemini_client=client)
     candidate=service.get_candidate(candidate_id)
     if candidate is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Candidate not found")
@@ -59,6 +64,8 @@ async def submit_score(
     payload: ScoreCreate,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
+    request: Request=None
+
 ):
     """
     Attaches evaluation assessment scores cards.
@@ -68,7 +75,8 @@ async def submit_score(
     if not candidate:
         raise HTTPException(status_code=404, detail="Target candidate profile reference missing.")
     
-    service = CandidateService(db)
+    client = request.app.state.gemini_container.get_client()
+    service=CandidateService(db,gemini_client=client)  
     try:
         record = await service.add_score(
             candidate_id=candidate_id,
@@ -103,12 +111,15 @@ def archive_candidate(
     candidate_id: str,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
+    request: Request=None
+
 ):
     # Admin-only. Always a soft delete - see CandidateService.archive_candidate.
     if current_user.role != Role.admin:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Admin access required")
  
-    service = CandidateService(db)
+    client = request.app.state.gemini_container.get_client()
+    service=CandidateService(db,gemini_client=client)
     try:
         service.archieve_candidate(candidate_id)
     except ValueError as e:

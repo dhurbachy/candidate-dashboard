@@ -6,11 +6,11 @@ from sqlalchemy.orm import Session
 from ..models import Candidate,Score,User,CandidateStatus
 from app.services.broadcaster import score_broadcaster
 from google import genai
-from logging import Logger
+from app.logging import logger
 from google.genai import errors
 
 class CandidateService:
-    def __init__(self,db:Session,gemini_client: Optional[genai.Client]=None):
+    def __init__(self,db:Session,gemini_client: genai.Client):
         self.db=db
         self.gemini_client = gemini_client
 
@@ -128,7 +128,7 @@ class CandidateService:
             summary_method = "llm"
 
         except Exception as e:
-            # Logger.error(f"Gemini summary generation failed for candidate {candidate_id}: {e}", exc_info=True)
+            logger.error(f"Gemini summary generation failed for candidate {candidate_id}: {e}", exc_info=True)
             summary = self._fallback_summary(candidate, skills_str)
             summary_method = "fallback"
 
