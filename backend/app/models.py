@@ -1,5 +1,5 @@
 import datetime
-from sqlalchemy import Column,Integer,String, ForeignKey,DateTime,Index,UniqueConstraint,CheckConstraint
+from sqlalchemy import Column,Integer,Boolean,String, ForeignKey,DateTime,Index,UniqueConstraint,CheckConstraint
 from sqlalchemy.orm import relationship,declarative_base
 import enum
 from sqlalchemy.types import JSON
@@ -19,6 +19,9 @@ class User(Base):
 
     role=Column(String,nullable=False)
     deleted_at=Column(DateTime,nullable=True,default=None)
+    refresh_tokens = relationship(
+        "RefreshToken", back_populates="user", cascade="all, delete-orphan"
+    )
 
 class Candidate(Base):
     """
@@ -81,3 +84,15 @@ class CandidateStatus(str, enum.Enum):
 class Role(str, enum.Enum):
     reviewer = "reviewer"
     admin = "admin"
+
+class RefreshToken(Base):
+    __tablename__ = "refresh_tokens"
+
+    id = Column(Integer, primary_key=True, index=True)
+    token = Column(String, unique=True, index=True, nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    expires_at = Column(DateTime, nullable=False)
+    revoked = Column(Boolean, default=False, nullable=False)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow(), nullable=False)
+
+    user = relationship("User", back_populates="refresh_tokens")

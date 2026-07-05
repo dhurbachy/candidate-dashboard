@@ -98,3 +98,7 @@ class GeminiSummaryData(BaseModel):
 class SummaryResponse(BaseModel):
     status: str 
     summary: GeminiSummaryData
+
+class TokenResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
