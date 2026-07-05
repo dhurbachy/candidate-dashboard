@@ -23,7 +23,7 @@ export default function ProtectedRoute({
 
 if (!accessToken) {
     // Save the current location in state so the Login component can send them back here
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    return <Navigate to="/login" state={{ from: location.pathname }} replace />;
   }
 
 
