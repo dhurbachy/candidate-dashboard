@@ -2,9 +2,11 @@ import datetime
 from sqlalchemy import Column,Integer,Boolean,String, ForeignKey,DateTime,Index,UniqueConstraint,CheckConstraint
 from sqlalchemy.orm import relationship,declarative_base
 import enum
+from app.database import Base
+
 from sqlalchemy.types import JSON
 
-Base=declarative_base()
+# Base=declarative_base()
 
 class User(Base):
     """
