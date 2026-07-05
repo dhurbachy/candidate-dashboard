@@ -1,5 +1,6 @@
 import { lazy } from "react";
 import { ROUTES } from "./routeConstant";
+import { Navigate } from "react-router";
 const Login = lazy(() => import("../app/auth/pages/login"));
 const Dashboard =lazy(()=>import("../app/dashboard/pages/dashboard"))
 const Register = lazy(() => import("../app/auth/pages/register"));
@@ -8,7 +9,7 @@ const CandidateDetail=lazy(()=>import("../app/candidate/pages/candidateDetail"))
 export const RouteList = [
   {
     path: ROUTES.HOME,
-    element: <>Home</>,
+    element: <Navigate to={ROUTES.LOGIN} replace />,
   },
   {
     path: ROUTES.DASHBOARD,
