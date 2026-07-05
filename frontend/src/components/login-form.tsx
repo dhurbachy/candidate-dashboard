@@ -9,17 +9,76 @@ import {
   FieldSeparator,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { Link } from "react-router"
+import { Link ,useNavigate} from "react-router"
+import { ROUTES } from "../routes/routeConstant";
+import { toast } from "sonner";
+import { useLogin } from "../app/auth/hook/login"
+import { useState } from "react"
+import { ApiError } from "../services/candidates-services"
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+  const { mutate: login, isPending, isError, error } = useLogin();
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const navigate = useNavigate();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const handleSubmit = (e: React.FormEvent) => {
+     e.preventDefault();
+    if (!validate()) return;
+    login(
+      { email, password },
+      {
+        onSuccess: () => {
+          navigate(ROUTES.DASHBOARD);
+        },
+        onError: (error: any) => {
+          let errorMessage = "An unexpected error occurred";
+
+          // Check if it's the specific ApiError from your generated services
+          if (error instanceof ApiError) {
+            // 2. Check for the specific 401 code
+            if (error.status === 401) {
+              // Priority: Backend Message -> HTTP Status Text -> Friendly Fallback
+              errorMessage = "Invalid email or password";
+            } else {
+              errorMessage =
+                error.body?.message || error.statusText || errorMessage;
+            }
+          }
+
+          toast.error("Login failed", {
+            description: errorMessage,
+          });
+        },
+      },
+    );
+  };
+  const validate = () => {
+    const newErrors: Record<string, string> = {};
+    if (!email.trim()) {
+      newErrors.email = "Email is required";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      newErrors.email = "Please enter a valid email";
+    }
+
+    if (!password) {
+      newErrors.password = "Password is required";
+    } else if (password.length < 6) {
+      newErrors.password = "Password must be at least 6 characters";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card className="overflow-hidden p-0">
         <CardContent className="grid p-0 md:grid-cols-1">
-          <form className="p-6 md:p-8">
+          <form className="p-6 md:p-8" onSubmit={handleSubmit} noValidate>
             <FieldGroup>
               <div className="flex flex-col items-center gap-2 text-center">
                 <h1 className="text-2xl font-bold">Welcome back</h1>
@@ -27,6 +86,13 @@ export function LoginForm({
                   Login to your ABC Inc account
                 </p>
               </div>
+               {(isError || errors.server) && (
+                <p className="rounded-md bg-red-500/10 px-3 py-2 text-xs text-red-400 text-center border border-red-500/20">
+                  {errors.server ||
+                    (error as any)?.response?.data?.message ||
+                    "Login failed."}
+                </p>
+              )}
               <Field>
                 <FieldLabel htmlFor="email">Email</FieldLabel>
                 <Input
@@ -34,22 +100,44 @@ export function LoginForm({
                   type="email"
                   placeholder="m@example.com"
                   required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  disabled={isPending}
                 />
+                {errors.email && (
+                  <p className="text-xs text-red-400 text-left">
+                    {errors.email}
+                  </p>
+                )}
               </Field>
               <Field>
                 <div className="flex items-center">
                   <FieldLabel htmlFor="password">Password</FieldLabel>
-                  <a
+                  {/* <a
                     href="#"
                     className="ml-auto text-sm underline-offset-2 hover:underline"
                   >
                     Forgot your password?
-                  </a>
+                  </a> */}
                 </div>
-                <Input id="password" type="password" required />
+                <Input  
+                id="password"
+                  type="password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  disabled={isPending} />
+                  {errors.password && (
+                  <p className="text-xs text-red-400 text-left">
+                    {errors.password}
+                  </p>
+                )}
               </Field>
+              
               <Field>
-                <Button type="submit">Login</Button>
+               <Button type="submit" disabled={isPending} className="w-full">
+                  {isPending ? "Logging in…" : "Login"}
+                </Button>
               </Field>
               <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
                 Or continue with
