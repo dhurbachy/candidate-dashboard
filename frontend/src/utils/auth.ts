@@ -11,6 +11,7 @@ export const useAxiosInterceptor = () => {
       (error) => {
         // If any API call returns 401 Unauthorized, wipe the state immediately
         if (error.response?.status === 401) {
+          console.log('logout')
           logout();
         }
         return Promise.reject(error);

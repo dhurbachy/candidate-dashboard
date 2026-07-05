@@ -6,37 +6,25 @@ export default function ProtectedRoute({
 }: {
   children: React.ReactNode;
 }) {
-  const {accessToken}=useAuth();
-  const isAuthenticated = !!accessToken;
+  const {accessToken,isLoading}=useAuth();
+  // const isAuthenticated = !!accessToken;
   // const isAuthenticated = true;
 
 //   const { data: user,isLoading } = useGetMe();
 //   const currentRoute = RouteList.find(r => r.path === location.pathname);
 
 
-  if (!isAuthenticated) {
-    // authService.signinRedirect();
-
-    // return (
-    //   <div
-    //     style={{
-    //       height: "100vh",
-    //       display: "flex",
-    //       justifyContent: "center",
-    //       alignItems: "center",
-    //     }}
-    //   >
-    //   </div>
-    // );
-    return <Navigate to="/login" replace />
-
+  if (isLoading) {
+    return <div>Loading your workspace...</div>;
   }
-//   if(isLoading) {
-//     return <><div>Loading ...</div></>;
-//   }
 //   if (currentRoute?.roles && !currentRoute?.roles.includes(user?.role)) {
 //     return <Navigate to="/forbidden" replace />;
 //   }
+
+if (!accessToken) {
+    // Save the current location in state so the Login component can send them back here
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
 
 
 

@@ -19,6 +19,7 @@ export type { ScoreCreate } from './models/ScoreCreate';
 export type { ScoreOut } from './models/ScoreOut';
 export type { SummaryResponse } from './models/SummaryResponse';
 export type { Token } from './models/Token';
+export type { TokenResponse } from './models/TokenResponse';
 export type { UserLogin } from './models/UserLogin';
 export type { UserOut } from './models/UserOut';
 export type { UserRegister } from './models/UserRegister';
