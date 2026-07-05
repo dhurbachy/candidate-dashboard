@@ -28,14 +28,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const logout = useCallback(() => {
-  setAccessToken(null);
-  OpenAPI.TOKEN = "";
-
   AuthenticationGatewaySuiteService.logoutApiAuthLogoutPost()
     .catch((err) => {
       console.error("Failed to clear backend cookie session:", err);
-    }) 
+    })
     .finally(() => {
+      setAccessToken(null);
+      OpenAPI.TOKEN = "";
       window.location.href = "/login";
     });
 }, []);
