@@ -17,12 +17,12 @@ export default defineConfig(({ mode }) => {
       },
     },
     server: {
+      host: true, 
+    port: 5173,
       proxy: {
         '/api': {
-          // Now 'env' is correctly evaluated here
-          target: env.VITE_API_BASE_URL || 'http://localhost:8000',
+          target: 'http://localhost:8000', 
           changeOrigin: true,
-          secure: false,
         },
       },
     },
