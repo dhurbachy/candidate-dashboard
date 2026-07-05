@@ -1,7 +1,7 @@
 import { lazy } from "react";
 import { ROUTES } from "./routeConstant";
 const Login = lazy(() => import("../app/auth/pages/login"));
-
+const Dashboard =lazy(()=>import("../app/dashboard/pages/dashboard"))
 const Register = lazy(() => import("../app/auth/pages/register"));
 
 export const RouteList = [
@@ -11,7 +11,7 @@ export const RouteList = [
   },
   {
     path: ROUTES.DASHBOARD,
-    element: <>Dashboard</>,
+    element:<Dashboard />,
   },
   {
     path: ROUTES.LOGIN,
