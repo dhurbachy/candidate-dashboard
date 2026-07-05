@@ -14,7 +14,8 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar"
-
+import {ROUTES} from "../routes/routeConstant"
+import { Link } from "react-router"
 const data = {
   versions: ["1.0.1", "1.1.0-alpha", "2.0.0-beta1"],
   navMain: [
@@ -23,8 +24,12 @@ const data = {
       url: "#",
       items: [
         {
+          title: "Dashboard",
+          url: ROUTES.DASHBOARD,
+        },
+        {
           title: "Candidates",
-          url: "#",
+          url: ROUTES.CANDIDATES,
         },
         
       ],
@@ -51,8 +56,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 {item.items.map((item) => (
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton
-                      isActive={item.isActive}
-                      render={<a href={item.url} />}
+                      // isActive={item.isActive}
+                      render={<Link to={item.url} />}
                     >
                       {item.title}
                     </SidebarMenuButton>

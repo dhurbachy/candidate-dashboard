@@ -1,15 +1,14 @@
 
 import { Navigate } from "react-router";
-
+import { useAuth } from "../context/authContext";
 export default function ProtectedRoute({
   children
 }: {
   children: React.ReactNode;
 }) {
-  //  const isAuthenticated=true;
-//   const {accessToken}=useAuth();
-//   const isAuthenticated = !!accessToken;
-  const isAuthenticated = true;
+  const {accessToken}=useAuth();
+  const isAuthenticated = !!accessToken;
+  // const isAuthenticated = true;
 
 //   const { data: user,isLoading } = useGetMe();
 //   const currentRoute = RouteList.find(r => r.path === location.pathname);

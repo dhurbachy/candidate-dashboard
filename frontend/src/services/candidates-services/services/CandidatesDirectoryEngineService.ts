@@ -22,7 +22,7 @@ export class CandidatesDirectoryEngineService {
      * @returns CandidateListResponse Successful Response
      * @throws ApiError
      */
-    public static getAllCandidatesCandidatesGet(
+    public static getAllCandidatesApiCandidatesGet(
         status?: (string | null),
         roleApplied?: (string | null),
         keyword?: (string | null),
@@ -32,7 +32,7 @@ export class CandidatesDirectoryEngineService {
     ): CancelablePromise<CandidateListResponse> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/candidates',
+            url: '/api/candidates',
             query: {
                 'status': status,
                 'role_applied': roleApplied,
@@ -52,12 +52,12 @@ export class CandidatesDirectoryEngineService {
      * @returns CandidateDetailResponse Successful Response
      * @throws ApiError
      */
-    public static getCandidateDetailsCandidatesCandidateIdGet(
+    public static getCandidateDetailsApiCandidatesCandidateIdGet(
         candidateId: number,
     ): CancelablePromise<CandidateDetailResponse> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/candidates/{candidate_id}',
+            url: '/api/candidates/{candidate_id}',
             path: {
                 'candidate_id': candidateId,
             },
@@ -75,13 +75,13 @@ export class CandidatesDirectoryEngineService {
      * @returns ScoreOut Successful Response
      * @throws ApiError
      */
-    public static submitScoreCandidatesCandidateIdScoresPost(
+    public static submitScoreApiCandidatesCandidateIdScoresPost(
         candidateId: number,
         requestBody: ScoreCreate,
     ): CancelablePromise<ScoreOut> {
         return __request(OpenAPI, {
             method: 'POST',
-            url: '/candidates/{candidate_id}/scores',
+            url: '/api/candidates/{candidate_id}/scores',
             path: {
                 'candidate_id': candidateId,
             },
@@ -98,12 +98,12 @@ export class CandidatesDirectoryEngineService {
      * @returns SummaryResponse Successful Response
      * @throws ApiError
      */
-    public static triggerSummaryCandidatesCandidateIdSummaryPost(
+    public static triggerSummaryApiCandidatesCandidateIdSummaryPost(
         candidateId: string,
     ): CancelablePromise<SummaryResponse> {
         return __request(OpenAPI, {
             method: 'POST',
-            url: '/candidates/{candidate_id}/summary',
+            url: '/api/candidates/{candidate_id}/summary',
             path: {
                 'candidate_id': candidateId,
             },
@@ -118,12 +118,12 @@ export class CandidatesDirectoryEngineService {
      * @returns void
      * @throws ApiError
      */
-    public static archiveCandidateCandidatesIdDelete(
+    public static archiveCandidateApiCandidatesIdDelete(
         candidateId: string,
     ): CancelablePromise<void> {
         return __request(OpenAPI, {
             method: 'DELETE',
-            url: '/candidates/{id}',
+            url: '/api/candidates/{id}',
             query: {
                 'candidate_id': candidateId,
             },
@@ -139,10 +139,10 @@ export class CandidatesDirectoryEngineService {
      * @returns any Successful Response
      * @throws ApiError
      */
-    public static streamLiveScoreCardsCandidatesStreamScoresGet(): CancelablePromise<any> {
+    public static streamLiveScoreCardsApiCandidatesStreamScoresGet(): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/candidates/stream/scores',
+            url: '/api/candidates/stream/scores',
         });
     }
 }

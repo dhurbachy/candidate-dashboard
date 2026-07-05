@@ -1,4 +1,4 @@
-import { useMutation,useQueryClient } from "@tanstack/react-query";
+import { useMutation,useQuery,useQueryClient } from "@tanstack/react-query";
 import type { ApiError } from "../../../services/candidates-services";
 import { AuthenticationGatewaySuiteService } from "../../../services/candidates-services/services/AuthenticationGatewaySuiteService";
 import { OpenAPI } from "../../../services/candidates-services/core/OpenAPI";
@@ -18,9 +18,9 @@ export const useLogin = () => {
     mutationFn: (payload: LoginPayload) =>
       AuthenticationGatewaySuiteService.loginApiAuthLoginPost(payload),
     onSuccess: (data) => {
-      console.log(data);
+      // console.log(data);
       const token = data.access_token;
-      console.log(token);
+      // console.log(token);
       if (token) {
         // localStorage.setItem("access_token", token);
         login(token);
@@ -29,5 +29,17 @@ export const useLogin = () => {
         OpenAPI.TOKEN = token;
       }
     },
+  });
+};
+
+export const useGetMe = () => {
+  const {accessToken}=useAuth();
+  return useQuery({
+    queryKey: ["me"],
+    queryFn: () => AuthenticationGatewaySuiteService.meApiAuthMeGet(),
+    staleTime: 5 * 60 * 1000,
+    enabled: !!accessToken,
+    retry: false,
+    refetchOnWindowFocus: false,
   });
 };

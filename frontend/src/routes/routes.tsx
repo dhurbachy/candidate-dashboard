@@ -3,7 +3,8 @@ import { ROUTES } from "./routeConstant";
 const Login = lazy(() => import("../app/auth/pages/login"));
 const Dashboard =lazy(()=>import("../app/dashboard/pages/dashboard"))
 const Register = lazy(() => import("../app/auth/pages/register"));
-
+const Candidate=lazy(()=>import("../app/candidate/pages/candidate"))
+const CandidateDetail=lazy(()=>import("../app/candidate/pages/candidateDetail"))
 export const RouteList = [
   {
     path: ROUTES.HOME,
@@ -12,6 +13,8 @@ export const RouteList = [
   {
     path: ROUTES.DASHBOARD,
     element:<Dashboard />,
+    protected: true,
+
   },
   {
     path: ROUTES.LOGIN,
@@ -26,12 +29,12 @@ export const RouteList = [
   
   {
     path: ROUTES.CANDIDATES,
-    element: <>Candidates</>,
+    element: <Candidate />,
     protected: true,
   },
   {
     path: ROUTES.CANDIDATE_DETAIL,
-    element: <>Candidates Detail</>,
+    element: <CandidateDetail />,
     protected: true,
   },
   

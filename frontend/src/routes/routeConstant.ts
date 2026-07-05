@@ -7,7 +7,7 @@ export const ROUTES = {
     USERS: '/users',
     NOTFOUND: '/not-found',
     FORBIDDEN: '/forbidden',
-    CANDIDATE_DETAIL: '/candidates/:candidates/detail',
+    CANDIDATE_DETAIL: '/candidates/:candidate_id/detail',
 
 
 }
