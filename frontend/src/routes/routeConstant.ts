@@ -3,11 +3,11 @@ export const ROUTES = {
     LOGIN: '/login',
     DASHBOARD: '/dashboard',
     REGISTER: '/register',
-    CANDIDATES: '/artists',
+    CANDIDATES: '/candidates',
     USERS: '/users',
     NOTFOUND: '/not-found',
     FORBIDDEN: '/forbidden',
-    CANDIDATE_DETAIL: '/artists/:artistId/songs',
+    CANDIDATE_DETAIL: '/candidates/:candidates/detail',
 
 
 }
